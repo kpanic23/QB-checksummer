@@ -1,0 +1,33 @@
+DIM b AS STRING * 1
+DIM cs AS INTEGER
+DIM char AS STRING * 1
+OPEN COMMAND$ FOR BINARY AS #1
+DO
+        GET #1, , b
+        IF NOT EOF(1) THEN
+                cs = (cs + ASC(b)) MOD 256
+        ELSE
+                IF cs + ASC(b) = 0 THEN
+                        PRINT "Checksum is 0, valid image!"
+                        END
+                ELSE
+                        cb = ASC(b)
+                        cbn = 256 - cs
+                        PRINT "Checksum is "; HEX$(cs + lb); ", should be 0"
+                        PRINT "Checksum byte is "; HEX$(cb); ", should be "; HEX$(cbn)
+                        PRINT "Do you want me to change it? (Y/N)"
+                        PRINT "WARNING!!! File will be overwritten!"
+                        PRINT "Make sure to have a backup copy!"
+                        DO WHILE i$ = "": i$ = INKEY$: LOOP
+                        IF i$ = "Y" OR i$ = "y" THEN
+                                SEEK #1, LOF(1) - 1
+                                char = CHR$(cbn)
+                                PUT #1, , char$
+                                PRINT "New checksum written."
+                        END IF
+                        CLOSE #1
+                        END
+                END IF
+        END IF
+LOOP
+
